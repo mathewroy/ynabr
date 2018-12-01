@@ -14,4 +14,4 @@
   
 * **What is the goal of this project?**  
 
-  The goal of this project is to enable YNAB users to get a prespective on their own data. It also exists to show others how R can be used. I'm using it as an opportunity to learn R programming.
+  The goal of this project is to enable YNAB users to get a prespective on their own budgets and spending activities. It also exists to illustrate how R can be used. I'm using it as an opportunity to do both.
