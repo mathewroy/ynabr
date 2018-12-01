@@ -5,7 +5,7 @@
 ## Updated on: November 28 2018
 
 ## Clear items from memory if required (uncomment below)
-#rm(list = ls())
+rm(list = ls())
 #rm(list=ls(pattern="^searchcriterahere"))
 
 ## (Install) and load packages
@@ -22,7 +22,7 @@ require(tidyverse)
 ## Set full path of a one-lined .txt file containing token
 token_txt_file <- "token.txt"
 auth_token <- readChar(con = token_txt_file, 
-                       useBytes = file.info(token_txt_file)$size)
+                       nchars = file.info(token_txt_file)$size)
 ## OR set it within the script
 #auth_token <- "12342424242424242"
 
@@ -44,10 +44,9 @@ rm(tempvar_name)
 
 ## Function that will import data from YNAB's api
 getYNAB <- function(YNAB.url) {
-  
+  ## Get the JSON content, convert to text format, transform it to a 
+  ## list format and convert to a data frame
   df_json <-
-    ## Get the JSON content, convert to text format, transform it to a 
-    ## list format and convert to a data frame
     httr::GET(url = YNAB.url,
               add_headers(Authorization = glue::glue('bearer {auth_token}'))) %>%
     content(as = "text") %>%
@@ -73,7 +72,6 @@ removeColumnprefix <- function(x) {
   ## Return a list of new column names to lapply
   ## Assign the new column names to the columns that start with "data."
   ## Return a data frame with the new column names
-  
   df_name <- deparse(substitute(x))
   
   col_oldnames <- colnames(x)[grepl("^data.", colnames(x))]
@@ -114,7 +112,6 @@ getBudget <- function() {
   ## Convert input to integer
   ## If it isn't an integer greater than 0 then exit.
   ## Based on the input, return the correspoding Budget Name and ID
- 
   print(glue::glue('Enter the number associated with the budgest of interest:'))
   print(as.list(df_budgets$name))
   
@@ -141,14 +138,42 @@ budget_name_id <- getBudget()
 ## Create URLs for each endpoint and import data
 #df_transactions1 <- df_transactions
 for (i in c("accounts", "categories", "months", "payees", "transactions")) {
-  print(paste0(basepoint, "/budgets/", id_budget, "/", i))
-  assign(paste0("df_", i), getYNAB(paste0(basepoint, "/budgets/", budget_name_id[2], "/", i)))
-  assign(paste0("df_",i), removeColumnprefix(get(paste0("df_",i))))
-  print(colnames(get(paste0("df_",i))))
+  print(paste0(basepoint, "/budgets/", budget_name_id[1], "/", i))
+  assign(paste0("df_", i), getYNAB(paste0(
+    basepoint, "/budgets/", budget_name_id[1], "/", i
+  )))
+  assign(paste0("df_", i), removeColumnprefix(get(paste0("df_", i))))
+  
+  ## Get detailed category names
+  if (i == "categories") {
+    df_categories <- df_categories %>%
+      rename(subcategories = categories)
+    df_subcategories <-
+      lapply(df_categories$subcategories, as.data.frame) %>%
+      bind_rows
+  }
+  
+  ## Reformat month column in df_month
+  if (i == "months") {
+    df_months <- df_months %>%
+      mutate(month = lubridate::date(as.Date(month, "%Y-%m-%d")),
+             yearmo = strftime(month, "%y-%m"))
+  }
+  
+  ## Reformat transaction dates
+  if (i == "transactions") {
+    df_transactions <- df_transactions %>%
+      mutate(
+        date = as.Date(date, "%Y-%m-%d"),
+        yearmo = strftime(date, "%y-%m"),
+        dayofmonth = lubridate::day(as.Date(date, "%Y-%m-%d"))
+      )  %>%
+      arrange(desc(date))
+  }
 }
 rm(i)
 
-## Create URL (based on API's structure) to get updated transactions data 
+## Create URL (based on API's structure) to get updated transactions data
 ## and add new transactions
 ## Get the delta (last point of server interaction)
 refreshTransactions <- function() {
@@ -163,43 +188,59 @@ refreshTransactions <- function() {
   ## Remove any transactions which were deleted since df_transactions was
   ## originally created.
   ## If df_transactions doesn't exit, download all of the transaction data.
+  trans_url <- 
+    paste0(basepoint, "/budgets/", budget_name_id[1], "/transactions")
   
-  if (is.object(df_transactions) == TRUE) {
+  if (exists("df_transactions") == TRUE) {
     transactions_sk <- as.integer(max(df_transactions$server_knowledge))
     
+    new_trans_url <-
+      paste0(trans_url, "?last_knowledge_of_server=", as.integer(transactions_sk + 1))
+    
+    print(paste0("Getting new transactions from: ", new_trans_url))
+      
     df_transactions_delta <-
-      getYNAB(
-        paste0(basepoint, "/budgets/", budget_name_id[1], "/transactions", 
-          "?last_knowledge_of_server=", as.integer(transactions_sk + 1))) %>%
-      removeColumnprefix()
-    
-    df_transactions_updated <-
-      rbind(df_transactions, df_transactions_delta) %>%
-      arrange(id, desc(date)) %>%
-      distinct(id, .keep_all = TRUE) %>%
-      filter(deleted == FALSE)
-    
+      tryCatch({
+        getYNAB(new_trans_url) %>% removeColumnprefix() %>% 
+          mutate(date = as.Date(date, "%Y-%m-%d"),
+                 yearmo = strftime(date, "%y-%m"),
+                 dayofmonth = lubridate::day(as.Date(date, "%Y-%m-%d"))) %>% 
+          arrange(desc(date))
+        
+        print("Adding it to existing transaction dataset...")
+        df_transactions_updated <-
+          rbind(df_transactions, df_transactions_delta) %>%
+          arrange(id, desc(date)) %>% 
+          distinct(id, .keep_all = TRUE) %>%
+          filter(deleted == FALSE) %>% 
+          arrange(desc(date))
+        return(df_transactions_updated %>% 
+                 mutate(date = as.Date(date, "%Y-%m-%d"), yearmo = strftime(date, "%y-%m"),
+                        dayofmonth = lubridate::day(as.Date(date, "%Y-%m-%d"))) %>%
+                 arrange(desc(date)))
+      },
+      error = function(cond) {
+        df_transactions_updated <- df_transactions
+        message("Error. No new transactions to add.")
+        message(cond)
+        return(df_transactions_updated)
+      },
+      warning = function(cond) {
+        message("warning")
+        message(cond)
+        return(NULL)
+      })
   } else {
+    print(paste0("Getting new transactions from: ", trans_url))
     df_transactions_updated <-
       getYNAB(paste0(basepoint, "/budgets/", budget_name_id[1], "/transactions")) %>%
       removeColumnprefix()
+    return(df_transactions_updated %>% 
+             mutate(date = as.Date(date, "%Y-%m-%d"), yearmo = strftime(date, "%y-%m"),
+                    dayofmonth = lubridate::day(as.Date(date, "%Y-%m-%d"))) %>%
+             arrange(desc(date)))
   }
-  return(df_transactions_updated)
 }
+
 df_transactions <- refreshTransactions()
 
-
-## Reformat date column in df_transactions
-df_transactions <- df_transactions %>%
-  mutate(
-    date = as.Date(date, "%Y-%m-%d"),
-    yearmo = strftime(date, "%y-%m"),
-    dayofmonth = lubridate::day(as.Date(date, "%Y-%m-%d"))
-  )
-
-## Reformat month column in df_month
-df_months <- df_months %>%
-  mutate(
-    month = lubridate::date(as.Date(month, "%Y-%m-%d")),
-    yearmo = strftime(month, "%y-%m")
-    )
