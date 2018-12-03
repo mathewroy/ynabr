@@ -2,7 +2,7 @@
 ## Author: Mathew Roy
 ## Comment: Import and analyze YNAB data
 ## Created on: November 10, 2018
-## Updated on: November 28 2018
+## Updated on: December 1, 2018
 
 ## Clear items from memory if required (uncomment below)
 rm(list = ls())

@@ -1,8 +1,10 @@
 ## Title: YNAB for R
 ## Author: Mathew Roy
-## Comment: Import and analyze YNAB data
+## Comment: Displays monthly spending amounts between a start and end date, 
+##          for budget categories of interest and 
+##          compares it to historical spending as of the day of the month.
 ## Created on: November 10, 2018
-## Updated on: November 28 2018
+## Updated on: December 2, 2018
 
 ## Clear items from memory if required (uncomment below)
 #rm(list=ls(pattern="^searchcriterahere"))
@@ -16,6 +18,9 @@ require(jsonlite)
 
 #install.packges("tidyverse)
 require(tidyverse)
+
+#install.packages("plotly")
+require(plotly)
 
 ## Import data using Import_Data.R
 
@@ -45,46 +50,45 @@ plotMonthlyspending <- function(start,end,categories) {
       category_name %in% categories_of_int
     ) %>%
     group_by(category_name, yearmo) %>%
-    summarize(activity = sum(amount))
+    summarize(activity = -1 * sum(amount) / 1E3)
   
   ## Create variables of interest
-  meanofinterest = mean(-1 * df_of_interest$activity / 1E3)
-  medianofinterest = median(-1 * df_of_interest$activity / 1E3)
-  sdofinterest = sd (-1 * df_of_interest$activity / 1E3)
+  meanofinterest = mean(df_of_interest$activity)
+  medianofinterest = median(df_of_interest$activity)
+  sdofinterest = sd (-1 * df_of_interest$activity)
   
   ## Create plot
   out <- 
-    ggplot(df_of_interest, mapping = aes(x = yearmo, y = -1 * activity / 1E3)) +
-    ggtitle(paste0("Monthly Spending: ", paste0(categories_of_int,collapse = ", "))) + 
+    ggplot(df_of_interest, mapping = aes(x = yearmo, y = activity, fill = category_name)) +
+    ggtitle(paste0("Monthly Spending as of Day ", day_of_mont_of_int, ": ", paste0(categories_of_int,collapse = ", "))) + 
     geom_col() +
     geom_hline(yintercept = meanofinterest - (1 * sdofinterest)) +
     geom_hline(yintercept = medianofinterest) +
     #geom_hline(yintercept = meanofinterest) +
     geom_hline(yintercept = meanofinterest + (1 * sdofinterest)) +
-    geom_text(aes(x = min(yearmo),y = meanofinterest - (1 * sdofinterest), label = "-1 S.D.: ", vjust = -0.5)) +
-    geom_text(aes(x = min(yearmo),y = medianofinterest, label = "Median: ", vjust = -0.5)) +
+    geom_text(aes(x = min(yearmo),y = meanofinterest - (1 * sdofinterest), label = "-1 S.D.: ", vjust = -1.0)) +
+    geom_text(aes(x = min(yearmo),y = medianofinterest, label = "Median: ", vjust = -1.0)) +
     #geom_text(aes(x = min(yearmo),y = meanofinterest, label = "Mean: ", vjust = -0.5)) +
-    geom_text(aes(x = min(yearmo),y = meanofinterest + (1 * sdofinterest), label = "+1 S.D.: ", vjust = -0.5)) +
+    geom_text(aes(x = min(yearmo),y = meanofinterest + (1 * sdofinterest), label = "+1 S.D.: ", vjust = -2.0)) +
     theme(axis.text.x = element_text(angle = 45)) +
     scale_x_discrete(name = "Year-Month") +
     scale_y_continuous(name = "Spending",
                        labels = scales::dollar,
                        breaks = sort(
                          c(
-                           seq(0, ceiling(max(-1 * df_of_interest$activity / 1E3) / 10) * 10, length.out = 2), 
+                           seq(0, ceiling(max(df_of_interest$activity) / 10) * 10, length.out = 2), 
                            meanofinterest - (1 * sdofinterest),
                            #meanofinterest,
                            medianofinterest,
                            meanofinterest + (1 * sdofinterest)
                            )
                          )
-                       )
+                       ) 
+  out <- ggplotly(out, tooltip = c("activity","yearmo","category_name"))
   return(out)  
 }
 
+## Create a plot (e.g.:)
 plotMonthlyspending(start = "2018-01-01",
                     end = "2018-11-30",
-                    categories = c("Gas"))
-
-
-?paste
+                    categories = c("Groceries", "Dining Out"))
