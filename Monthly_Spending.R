@@ -29,7 +29,7 @@ df_transactions <- refreshTransactions()
 
 ## Plot monthly spending by category and month (as as of day of month)
 ## Create dataset of interest
-plotMonthlyspending <- function(start,end,categories) {
+plotMonthlyspending <- function(start,end,categories,interactive = FALSE) {
   start_date_of_int <- as.Date(start)
   end_date_of_int <- as.Date(end)
   day_of_mont_of_int <- lubridate::day(end)
@@ -71,6 +71,7 @@ plotMonthlyspending <- function(start,end,categories) {
     #geom_text(aes(x = min(yearmo),y = meanofinterest, label = "Mean: ", vjust = -0.5)) +
     geom_text(aes(x = min(yearmo),y = meanofinterest + (1 * sdofinterest), label = "+1 S.D.: ", vjust = -2.0)) +
     theme(axis.text.x = element_text(angle = 45)) +
+    scale_fill_discrete(name = "Category") +
     scale_x_discrete(name = "Year-Month") +
     scale_y_continuous(name = "Spending",
                        labels = scales::dollar,
@@ -83,12 +84,16 @@ plotMonthlyspending <- function(start,end,categories) {
                            meanofinterest + (1 * sdofinterest)
                            )
                          )
-                       ) 
-  out <- ggplotly(out, tooltip = c("activity","yearmo","category_name"))
+                       )
+  if (interactive == TRUE) {
+    out <- ggplotly(out, tooltip = c("activity","yearmo","category_name"))
+  }
   return(out)  
 }
 
 ## Create a plot (e.g.:)
 plotMonthlyspending(start = "2018-01-01",
-                    end = "2018-11-30",
-                    categories = c("Groceries", "Dining Out"))
+                    end = Sys.Date(),
+                    categories = c("Gas"),
+                    interactive = FALSE)
+
