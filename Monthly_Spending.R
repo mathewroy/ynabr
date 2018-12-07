@@ -34,10 +34,19 @@ plotMonthlyspending <- function(start,end,categories,interactive = FALSE) {
   end_date_of_int <- as.Date(end)
   day_of_mont_of_int <- lubridate::day(end)
   #day_of_mont_of_int <- 30
+  
+  ## names of all categories
+  list_category_names <- sort(
+    trimws(
+      gsub("[^[:alnum:][:space:][:punct:]]",
+           "",
+           unique(df_transactions$category_name))))
+  
+  ## names of categories of interest to user
   categories_of_int <-
     grep(
       paste0(categories, collapse = "|"),
-      unique(df_transactions$category_name),
+      list_category_names,
       value = TRUE,
       ignore.case = TRUE
     )
@@ -96,4 +105,24 @@ plotMonthlyspending(start = "2018-01-01",
                     end = Sys.Date(),
                     categories = c("Gas"),
                     interactive = FALSE)
+
+list_category_names <- sort(trimws(gsub("[^[:alnum:][:space:][:punct:]]","",unique(df_transactions$category_name))))
+categories <-  c("Gas")
+categories_of_int <-
+  grep(
+    paste0(categories, collapse = "|"),
+    list_category_names,
+    value = TRUE,
+    ignore.case = TRUE
+  )
+
+df_of_interest <- df_transactions %>%
+  filter(
+    date >= as.Date("2018-01-01"),
+    date <= Sys.Date(),
+    dayofmonth <= 7,
+    category_name %in% categories_of_int
+  ) %>%
+  group_by(category_name, yearmo) %>%
+  summarize(activity = -1 * sum(amount) / 1E3)
 
