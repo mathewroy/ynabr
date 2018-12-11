@@ -94,6 +94,12 @@ plotMonthlyspending <- function(start,end,categories,interactive = FALSE) {
 ## Create a plot (e.g.:)
 plotMonthlyspending(start = "2018-01-01",
                     end = Sys.Date(),
-                    categories = c("Gas"),
+                    categories = c("Gifts"),
                     interactive = FALSE)
 
+
+library(stringr)
+x <- unique(df_transactions$category_name)
+str_replace_all(x, "[[:punct:]]", "")
+iconv(astr, from = 'UTF-8', to = 'ASCII//TRANSLIT')
+.)
