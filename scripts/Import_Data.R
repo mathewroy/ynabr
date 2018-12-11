@@ -166,7 +166,8 @@ for (i in c("accounts", "categories", "months", "payees", "transactions")) {
       mutate(
         date = as.Date(date, "%Y-%m-%d"),
         yearmo = strftime(date, "%y-%m"),
-        dayofmonth = lubridate::day(as.Date(date, "%Y-%m-%d"))
+        dayofmonth = lubridate::day(as.Date(date, "%Y-%m-%d")),
+        category_name = trimws(gsub("[^[:alnum:][:space:][:punct:]]", "", category_name))
       )  %>%
       arrange(desc(date))
   }
@@ -204,7 +205,8 @@ refreshTransactions <- function() {
         df_transactions_delta <- getYNAB(new_trans_url) %>% removeColumnprefix() %>% 
           mutate(date = as.Date(date, "%Y-%m-%d"),
                  yearmo = strftime(date, "%y-%m"),
-                 dayofmonth = lubridate::day(as.Date(date, "%Y-%m-%d"))) %>% 
+                 dayofmonth = lubridate::day(as.Date(date, "%Y-%m-%d")),
+                 category_name = trimws(gsub("[^[:alnum:][:space:][:punct:]]", "", category_name))) %>% 
           arrange(desc(date))
         
         print("Adding it to existing transaction dataset...")
@@ -216,7 +218,8 @@ refreshTransactions <- function() {
           arrange(desc(date))
         return(df_transactions_updated %>% 
                  mutate(date = as.Date(date, "%Y-%m-%d"), yearmo = strftime(date, "%y-%m"),
-                        dayofmonth = lubridate::day(as.Date(date, "%Y-%m-%d"))) %>%
+                        dayofmonth = lubridate::day(as.Date(date, "%Y-%m-%d")),
+                        category_name = trimws(gsub("[^[:alnum:][:space:][:punct:]]", "", category_name))) %>%
                  arrange(desc(date)))
       },
       error = function(cond) {
@@ -237,7 +240,8 @@ refreshTransactions <- function() {
       removeColumnprefix()
     return(df_transactions_updated %>% 
              mutate(date = as.Date(date, "%Y-%m-%d"), yearmo = strftime(date, "%y-%m"),
-                    dayofmonth = lubridate::day(as.Date(date, "%Y-%m-%d"))) %>%
+                    dayofmonth = lubridate::day(as.Date(date, "%Y-%m-%d")),
+                    category_name = trimws(gsub("[^[:alnum:][:space:][:punct:]]", "", category_name))) %>%
              arrange(desc(date)))
   }
 }
