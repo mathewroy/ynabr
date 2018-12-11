@@ -1,0 +1,8 @@
+_config.yml
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+scripts/scraps
+token.txt
+ynabr.Rproj
