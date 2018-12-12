@@ -21,8 +21,7 @@ require(tidyverse)
 ## Authorizatin token code
 ## Set full path of a one-lined .txt file containing token
 token_txt_file <- "token.txt"
-auth_token <- readChar(con = token_txt_file, 
-                       nchars = file.info(token_txt_file)$size)
+auth_token <- readChar(con = token_txt_file, nchars = file.info(token_txt_file)$size)
 ## OR set it within the script
 #auth_token <- "12342424242424242"
 
@@ -50,7 +49,7 @@ getEndpoints <- function() {
 }
 
 ## Function that will import data from YNAB's api
-getYNAB <- function(YNAB.url) {
+getYNAB <- function(YNAB.url, auth_token = auth_token) {
   ## Get the JSON content, convert to text format, transform it to a 
   ## list format and convert to a data frame
   df_json <-
@@ -114,9 +113,6 @@ getStartingData <- function(i) {
     return(df)
 }
 
-#df_user <- getStartingData("user")
-#df_budgets <- getStartingData("budgets")
-
 ## Input name of the budget
 #name_budget <- c("My Budget")
 selectBudget <- function() {
@@ -153,18 +149,15 @@ selectBudget <- function() {
   return(c(budget_id, budget_name))
 }
 
-## Get budget name and ID
-budget_name_id <- selectBudget()
-
 ## Create URLs for each endpoint and import data
-#df_transactions1 <- df_transactions
-
 getBudgetDetails <- function(i) {
 
-  valid_i = c("accounts", "categories", "months", "payees", "subcategories", "transactions")
+  valid_i <-  c("accounts", "categories", "months", "payees", "payee_locations", 
+              "subcategories", "scheduled_transactions", "transactions")
+  k  <-  ""
   
-  if ((i %in% valid_i)) {
-    stop(paste0("Argument must be one of: ", valid_i))
+  if (!(i %in% valid_i)) {
+    stop(paste0(c("Argument must be one of: ", valid_i), collapse = " ")) 
   }
   
   if (i == "subcategories") {
@@ -177,25 +170,11 @@ getBudgetDetails <- function(i) {
     removeColumnprefix()
   
   if (i == "categories") {
-    df <- df %>%
-      rename(subcategories = categories)
-    df_subcategories <-
-      lapply(df_categories$subcategories, as.data.frame) %>%
-      bind_rows
-  }
-
-  }
-
-  
-  ## Reformat month column in df_month
-  if (i == "months") {
-    df_months <- df_months %>%
-      mutate(month = lubridate::date(as.Date(month, "%Y-%m-%d")),
-             yearmo = strftime(month, "%y-%m"))
-  }
-  
-  ## Reformat transaction dates
-  if (i == "transactions") {
+    df <- df %>% rename(subcategories = categories)
+  } else if (i == "months") {
+    df <- df %>% mutate(month = lubridate::date(as.Date(month, "%Y-%m-%d")),
+                        yearmo = strftime(month, "%y-%m"))
+  } else if (i == "transactions") {
     df_transactions <- df_transactions %>%
       mutate(
         date = as.Date(date, "%Y-%m-%d"),
@@ -205,8 +184,13 @@ getBudgetDetails <- function(i) {
       )  %>%
       arrange(desc(date))
   }
+
+  if (k == "subcategories") {
+    df <- lapply(df$subcategories, as.data.frame) %>% bind_rows
+  }
+
+  return(df)
 }
-rm(i)
 
 ## Create URL (based on API's structure) to get updated transactions data
 ## and add new transactions
@@ -227,10 +211,10 @@ refreshTransactions <- function() {
     paste0(basepoint, "/budgets/", budget_name_id[1], "/transactions")
   
   if (exists("df_transactions") == TRUE) {
+    
     transactions_sk <- as.integer(max(df_transactions$server_knowledge))
     
-    new_trans_url <-
-      paste0(trans_url, "?last_knowledge_of_server=", as.integer(transactions_sk + 1))
+    new_trans_url <- paste0(trans_url, "?last_knowledge_of_server=", as.integer(transactions_sk + 1))
     
     print(paste0("Getting new transactions from: ", new_trans_url))
       
@@ -250,35 +234,33 @@ refreshTransactions <- function() {
           distinct(id, .keep_all = TRUE) %>%
           filter(deleted == FALSE) %>% 
           arrange(desc(date))
-        return(df_transactions_updated %>% 
-                 mutate(date = as.Date(date, "%Y-%m-%d"), yearmo = strftime(date, "%y-%m"),
-                        dayofmonth = lubridate::day(as.Date(date, "%Y-%m-%d")),
-                        category_name = trimws(gsub("[^[:alnum:][:space:][:punct:]]", "", category_name))) %>%
-                 arrange(desc(date)))
+        return(df_transactions_updated)
       },
       error = function(cond) {
         df_transactions_updated <- df_transactions
         message("Error. No new transactions to add.")
         message(cond)
         return(df_transactions_updated)
-      },
-      warning = function(cond) {
-        message("warning")
-        message(cond)
-        return(NULL)
       })
   } else {
-    print(paste0("Getting new transactions from: ", trans_url))
-    df_transactions_updated <-
-      getYNAB(paste0(basepoint, "/budgets/", budget_name_id[1], "/transactions")) %>%
-      removeColumnprefix()
-    return(df_transactions_updated %>% 
-             mutate(date = as.Date(date, "%Y-%m-%d"), yearmo = strftime(date, "%y-%m"),
-                    dayofmonth = lubridate::day(as.Date(date, "%Y-%m-%d")),
-                    category_name = trimws(gsub("[^[:alnum:][:space:][:punct:]]", "", category_name))) %>%
-             arrange(desc(date)))
+    print("df_transactions does not exist. Getting it now..")
+    getBudgetDetails("transactions")
   }
 }
 
-df_transactions <- refreshTransactions()
+getEndpoints()
+df_user <- getStartingData("user")
+df_budgets <- getStartingData("budgets")
+
+budget_name_id <- selectBudget()
+
+df_accounts <- getBudgetDetails("accounts")
+df_categories <- getBudgetDetails("categories")
+df_subcategories <- getBudgetDetails("subcategories")
+df_months <- getBudgetDetails("months")
+df_payees <- getBudgetDetails("payees")
+df_payee_locations <- getBudgetDetails("payee_locations")
+df_scheduled_transactions <- getBudgetDetails("scheduled_transactions")
+df_transactions <- getBudgetDetails("transactions")
+#df_transactions <- refreshTransactions()
 
