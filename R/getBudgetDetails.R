@@ -16,6 +16,9 @@ getBudgetDetails <- function(i) {
   
   valid_i <-  c("accounts", "categories", "months", "payees", "payee_locations", 
                 "subcategories", "scheduled_transactions", "transactions")
+  
+  basepoint <- c("https://api.youneedabudget.com/v1")
+  
   k  <-  ""
   
   if (!(i %in% valid_i)) {
@@ -37,7 +40,7 @@ getBudgetDetails <- function(i) {
     df <- df %>% mutate(month = lubridate::date(as.Date(month, "%Y-%m-%d")),
                         yearmo = strftime(month, "%y-%m"))
   } else if (i == "transactions") {
-    df_transactions <- df_transactions %>%
+    df <- df %>%
       mutate(
         date = as.Date(date, "%Y-%m-%d"),
         yearmo = strftime(date, "%y-%m"),

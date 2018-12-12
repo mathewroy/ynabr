@@ -1,4 +1,4 @@
-Package: ynabR
+Package: ynabr
 Title: ynabR - YNAB meets R programming language.
 Version: 0.0.0.9000
 Authors@R: person("Mathew", "Roy", email = "mathewroy@hotmail.com", role = c("aut", "cre"))

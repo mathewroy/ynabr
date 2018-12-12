@@ -8,6 +8,9 @@
 
 ## (Install) and load packages
 {
+  #install.packages("devtools")
+  #require(devtools)
+  
   #install.packages("httr")
   require(httr)
   
@@ -18,13 +21,16 @@
   require(shiny)
   
   #install.packages("htmltools")
-  library(htmltools)
+  require(htmltools)
   
   #install.packges("tidyverse)
   require(tidyverse)
   
   #install.packages("plotly")
   require(plotly)
+  
+  #devtools::install_github("mathewroy/ynabr")
+  require(ynabr)
 }
 
 ## Date range picker (using months only)

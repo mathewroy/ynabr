@@ -6,6 +6,8 @@
 #' df_user <- getStartingData("user")
 #' df_budgets <- getStartingData("budgets") 
 getStartingData <- function(i) {
+  basepoint <- c("https://api.youneedabudget.com/v1")
+  
   if (!(i %in% c("user", "budgets"))) {
     stop("Please enter the arguments 'user' or 'budgets'.")
   }
