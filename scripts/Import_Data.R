@@ -31,16 +31,23 @@ basepoint <- c("https://api.youneedabudget.com/v1")
 
 ## Create URL segments for each endpoint
 ## Note: This data frame is not used anywhere else.
-df_ep <- 
-  c("user", "budgets", "accounts", "categories", "payees", "payee_locations", 
-    "months", "transactions", "scheduled_transactions") %>%
-  tibble(ep = ., urls = c(lapply(., function(x) paste0("/", x))))
-
-## Transpose the df_ep data frame
-tempvar_name <- df_ep$ep
-df_ep <- df_ep[, -1] %>% t() %>% as.data.frame()
-colnames(df_ep) <- tempvar_name
-rm(tempvar_name)
+getEndpoints <- function() {
+  df <-
+    c(
+      "user",
+      "budgets",
+      "accounts",
+      "categories",
+      "payees",
+      "payee_locations",
+      "months",
+      "transactions",
+      "scheduled_transactions"
+    ) %>%
+    tibble(ep = ., urls = c(lapply(., function(x)
+      paste0("/", x))))
+  return(df)
+}
 
 ## Function that will import data from YNAB's api
 getYNAB <- function(YNAB.url) {
@@ -96,62 +103,89 @@ removeColumnprefix <- function(x) {
   return(as.data.frame(x))
 }
 
-## Create URLs for each endpoint and import data
-for (i in c("user", "budgets")) {
-  print(paste0("Getting data from: ", basepoint, "/", i))
-  assign(paste0("df_", i), getYNAB(paste0(basepoint, "/", i)))
-  assign(paste0("df_", i), removeColumnprefix(get(paste0("df_", i))))
+## Create URLs for each endpoint and import data.
+getStartingData <- function(i) {
+  if (!(i %in% c("user", "budgets"))) {
+    stop("Please enter the arguments 'user' or 'budgets'.")
+  }
+    print(paste0("Getting data from: ", basepoint, "/", i))
+    df <- getYNAB(paste0(basepoint, "/", i)) %>% 
+      removeColumnprefix()
+    return(df)
 }
-rm(i)
+
+#df_user <- getStartingData("user")
+#df_budgets <- getStartingData("budgets")
 
 ## Input name of the budget
 #name_budget <- c("My Budget")
-getBudget <- function() {
+selectBudget <- function() {
+  
+  ## Create df_budgets if it doesn't exist
+  if (exists("df_budgets") == FALSE) {
+    df_budgets <- getStartingData("budgets")
+  }
+  
   ## Print a list of the budget names
   ## Ask user to input the number of the budget corresponding to place on list
   ## Convert input to integer
   ## If it isn't an integer greater than 0 then exit.
   ## Based on the input, return the correspoding Budget Name and ID
-  print(glue::glue('Enter the number associated with the budgest of interest:'))
+  print("Enter the number associated with the budgest of interest:")
   print(as.list(df_budgets$name))
   
-  budget_no_user_input <- readline(prompt = "Enter budget number: ") %>%
+  input_budget_no <- readline(prompt = "Enter budget number: ") %>%
     as.integer()
   
-  if(!is.integer(budget_no_user_input))
+  if (!is.integer(input_budget_no)) {
     stop("Input an integer")
+  }
   
-  if(budget_no_user_input < 0)
+  if (input_budget_no <= 0) {
     stop("Input should be an integer greater than/equal to 1")
- 
-   name_budget <- as.character(df_budgets$name[budget_no_user_input])
+  }
   
-   id_budget <- df_budgets %>% filter(name == name_budget) %>% select(id) %>%
+  budget_name <- as.character(df_budgets$name[input_budget_no])
+  
+  budget_id <- df_budgets %>% filter(name == budget_name) %>% select(id) %>%
     as.character()
   
-   return(c(id_budget,name_budget))
+  return(c(budget_id, budget_name))
 }
 
 ## Get budget name and ID
-budget_name_id <- getBudget()
+budget_name_id <- selectBudget()
 
 ## Create URLs for each endpoint and import data
 #df_transactions1 <- df_transactions
-for (i in c("accounts", "categories", "months", "payees", "transactions")) {
-  print(paste0(basepoint, "/budgets/", budget_name_id[1], "/", i))
-  assign(paste0("df_", i), getYNAB(paste0(
-    basepoint, "/budgets/", budget_name_id[1], "/", i
-  )))
-  assign(paste0("df_", i), removeColumnprefix(get(paste0("df_", i))))
+
+getBudgetDetails <- function(i) {
+
+  valid_i = c("accounts", "categories", "months", "payees", "subcategories", "transactions")
   
-  ## Get detailed category names
+  if ((i %in% valid_i)) {
+    stop(paste0("Argument must be one of: ", valid_i))
+  }
+  
+  if (i == "subcategories") {
+    i = "categories"
+    k = "subcategories"
+  }
+  
+  print(paste0(basepoint, "/budgets/", budget_name_id[1], "/", i))
+  df <- getYNAB(paste0(basepoint, "/budgets/", budget_name_id[1], "/", i)) %>% 
+    removeColumnprefix()
+  
   if (i == "categories") {
-    df_categories <- df_categories %>%
+    df <- df %>%
       rename(subcategories = categories)
     df_subcategories <-
       lapply(df_categories$subcategories, as.data.frame) %>%
       bind_rows
   }
+
+  }
+
   
   ## Reformat month column in df_month
   if (i == "months") {
