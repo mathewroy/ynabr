@@ -12,7 +12,7 @@ getStartingData <- function(i) {
     stop("Please enter the arguments 'user' or 'budgets'.")
   }
   print(paste0("Getting data from: ", basepoint, "/", i))
-  df <- getYNAB(paste0(basepoint, "/", i)) %>% 
-    removeColumnprefix()
+  df <- ynabr:::getYNAB(paste0(basepoint, "/", i)) %>% 
+    ynabr:::removeColumnprefix()
   return(df)
 }

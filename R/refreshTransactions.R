@@ -17,6 +17,7 @@ refreshTransactions <- function() {
   ## Remove any transactions which were deleted since df_transactions was
   ## originally created.
   ## If df_transactions doesn't exit, download all of the transaction data.
+  basepoint <- c("https://api.youneedabudget.com/v1")
   trans_url <- 
     paste0(basepoint, "/budgets/", budget_name_id[1], "/transactions")
   
@@ -30,7 +31,7 @@ refreshTransactions <- function() {
     
     df_transactions_updated <-
       tryCatch({
-        df_transactions_delta <- getYNAB(new_trans_url) %>% removeColumnprefix() %>% 
+        df_transactions_delta <- ynabr:::getYNAB(new_trans_url) %>% ynabr:::removeColumnprefix() %>% 
           mutate(date = as.Date(date, "%Y-%m-%d"),
                  yearmo = strftime(date, "%y-%m"),
                  dayofmonth = lubridate::day(as.Date(date, "%Y-%m-%d")),
@@ -54,6 +55,6 @@ refreshTransactions <- function() {
       })
   } else {
     print("df_transactions does not exist. Getting it now..")
-    getBudgetDetails("transactions")
+    ynabr:::getBudgetDetails("transactions") %>% getUnsplit()
   }
 }
