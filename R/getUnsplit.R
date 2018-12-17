@@ -4,7 +4,7 @@
 #' @examples
 #' df <- getUnsplit(df_transactions) 
 getUnsplit <- function(d) {
-    if (grep('^Software', d[, c("category_name")]) >= 1) {
+    if (grep('^Split (Multiple Categories)...', d[, c("category_name")]) >= 1) {
       d[, c("subtransactions")] %>% 
       bind_rows() %>% 
       rename(subtransaction_id = "id", id = "transaction_id") %>%
