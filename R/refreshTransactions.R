@@ -55,6 +55,6 @@ refreshTransactions <- function() {
       })
   } else {
     print("df_transactions does not exist. Getting it now..")
-    ynabr:::getBudgetDetails("transactions") %>% getUnsplit()
+    ynabr:::getBudgetDetails("transactions")
   }
 }
