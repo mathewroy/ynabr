@@ -6,7 +6,7 @@
 getUnsplit <- function(d) {
     d[,c("subtransactions")] %>% 
     bind_rows() %>% 
-    rename(subtransaction_id = id, id = transaction_id) %>%
+    rename(subtransaction_id = "id", id = "transaction_id") %>%
     bind_rows(select(d, -subtransactions), .) %>%
     group_by(id) %>% 
     filter(all("Split (Multiple Categories)..." %in% category_name)) %>% 
