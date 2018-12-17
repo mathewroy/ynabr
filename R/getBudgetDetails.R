@@ -48,7 +48,7 @@ getBudgetDetails <- function(i) {
         dayofmonth = lubridate::day(as.Date(date, "%Y-%m-%d")),
         category_name = trimws(gsub("[^[:alnum:][:space:][:punct:]]", "", category_name))
       ) %>% 
-      getUnsplit()
+      ynabr:::getUnsplit()
     
   }
   
