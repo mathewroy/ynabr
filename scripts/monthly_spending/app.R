@@ -35,8 +35,7 @@
 
 ## Date range picker (using months only)
 ## Source: https://stackoverflow.com/a/38974106/9697283
-{
-  dateRangeMonthsInput <- {
+{dateRangeMonthsInput <- {
     function(inputId,
              label,
              start = NULL,
