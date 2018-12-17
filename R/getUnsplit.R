@@ -4,8 +4,7 @@
 #' @examples
 #' df <- getUnsplit(df_transactions) 
 getUnsplit <- function(d) {
-    d %>% 
-    select(subtransactions) %>% 
+    d$subtransactions %>% 
     bind_rows() %>% 
     rename(subtransaction_id = "id", id = "transaction_id") %>%
     bind_rows(select(d, -subtransactions), .) %>%
