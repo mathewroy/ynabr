@@ -18,29 +18,32 @@ require(httr)
 #install.packages("jsonlite")
 require(jsonlite)
 
-#install.packages("tidyverse")
+#install.packages(tidyverse)
 require(tidyverse)
-
-#devtools::install_github("mathewroy/ynabr")
+require(roxygen2)
+document()
+devtools::install_github("mathewroy/ynabr")
 require(ynabr)
 
 ## Authorization token code
 ## Set full path of a one-lined .txt file containing token
-token_txt_file <- "token.txt"
+token_txt_file <- "E:/Users/User/Documents/ynabr/token.txt"
 auth_token <- readChar(con = token_txt_file, nchars = file.info(token_txt_file)$size)
 #auth_token <- "12342424242424242"
 
 getEndpoints()
 df_user <- getStartingData("user")
 df_budgets <- getStartingData("budgets")
-
-budget_name_id <- selectBudget()
+budget_name_id <- ynabr:::selectBudget()
 df_accounts <- getBudgetDetails("accounts")
-df_categories <- getBudgetDetails("categories")
-df_subcategories <- getBudgetDetails("subcategories")
+df_categories <- ynabr:::getBudgetDetails("categories")
+df_subcategories <- ynabr:::getBudgetDetails("subcategories")
 df_months <- getBudgetDetails("months")
 df_payees <- getBudgetDetails("payees")
 df_payee_locations <- getBudgetDetails("payee_locations")
 df_scheduled_transactions <- getBudgetDetails("scheduled_transactions")
 df_transactions <- refreshTransactions()
+df_transactions <- ynabr:::getBudgetDetails("transactions")
 
+basepoint <- c("https://api.youneedabudget.com/v1")
+budget_name_id <- ynabr:::selectBudget()

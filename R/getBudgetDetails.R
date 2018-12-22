@@ -31,8 +31,8 @@ getBudgetDetails <- function(i) {
   }
   
   print(paste0(basepoint, "/budgets/", budget_name_id[1], "/", i))
-  df <- getYNAB(paste0(basepoint, "/budgets/", budget_name_id[1], "/", i)) %>% 
-    removeColumnprefix()
+  df <- ynabr:::getYNAB(paste0(basepoint, "/budgets/", budget_name_id[1], "/", i)) %>% 
+    ynabr:::removeColumnprefix()
   
   if (i == "categories") {
     df <- df %>% rename(subcategories = categories)
@@ -47,8 +47,8 @@ getBudgetDetails <- function(i) {
         yearmo = strftime(date, "%y-%m"),
         dayofmonth = lubridate::day(as.Date(date, "%Y-%m-%d")),
         category_name = trimws(gsub("[^[:alnum:][:space:][:punct:]]", "", category_name))
-      ) %>% 
-      ynabr:::getUnsplit()
+      )
+    df <- ynabr:::getUnsplit(df)
     
   }
   
