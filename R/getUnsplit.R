@@ -4,8 +4,9 @@
 #' @examples
 #' df <- getUnsplit(df_transactions) 
 getUnsplit <- function(d) {
-    if (grep('^Split (Multiple Categories)...', d[, c("category_name")]) >= 1) {
-      d[, c("subtransactions")] %>% 
+  ifelse(
+    test = any(grep('^Split', d[,c("category_name")], value = FALSE)), 
+    yes = {e <- d[, c("subtransactions")] %>% 
       bind_rows() %>% 
       rename(subtransaction_id = "id", id = "transaction_id") %>%
       bind_rows(select(d, -subtransactions), .) %>%
@@ -21,8 +22,11 @@ getUnsplit <- function(d) {
       select(-c(payee_name.x, category_name.x), payee_name = "payee_name.y", category_name = "category_name.y") %>% 
       bind_rows(select(d, -subtransactions), .) %>% 
       filter(!grepl('^Split', category_name)) %>%
-      arrange(desc(date))
-    } else {
-      d %>% select(-subtransactions) %>% arrange(desc(date))
+      arrange(desc(date)) %>% as.data.frame()
+    return(e)
+    },
+    no = {e <- d %>% select(-subtransactions) %>% arrange(desc(date)) %>% as.data.frame()
+    return(e)
     }
+  )
 }
