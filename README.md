@@ -2,11 +2,18 @@
 
 * **What is ynabR?** 
 
-  ynabR is a set of R scripts that demonstrates how data from the popular budgeting software, You Need A Budget (YNAB), can be imported, analyzed, and visualized.
+  ynabR is an R package and a set of scripts that demonstrates how data from the popular budgeting software, You Need A Budget (YNAB), can be imported, analyzed, and visualized.
 
 * **How does it work?**
 
-  The scripts rely on connecting to YNAB's Application Program Interface (API), and extracting the available data related to accounts, users, monthly budgets, payees, transactions etc... After the appropriate data is extracted, the scripts will focus on analyzing and visualizing such data (e.g. looking to see if month-to-day spending for any budget category is on track with past spending).
+  The package and scripts rely on connecting to YNAB's Application Program Interface (API), and extracting the available data related to accounts, users, monthly budgets, payees, transactions etc... After the appropriate data is extracted, the scripts will focus on analyzing and visualizing such data (e.g. looking to see if month-to-day spending for any budget category is on track with past spending).
+ 
+* **How do I install ynabR?**  
+  ```r
+  devtools::install_github("mathewroy/ynabr")  
+  library(ynabr)  
+  ```   
+  Note that this requires the _devtools_ package.  
   
 * **Who will use ynabR**
 
