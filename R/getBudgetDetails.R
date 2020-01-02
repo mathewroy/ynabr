@@ -14,6 +14,10 @@
 #' df_transactions <- getBudgetDetails("transactions")
 getBudgetDetails <- function(i) {
   
+  if (exists("budget_name_id") == FALSE) {
+    budget_name_id <<- selectBudget()
+  }
+  
   valid_i <-  c("accounts", "categories", "months", "payees", "payee_locations", 
                 "subcategories", "scheduled_transactions", "transactions")
   
@@ -31,8 +35,8 @@ getBudgetDetails <- function(i) {
   }
   
   print(paste0(basepoint, "/budgets/", budget_name_id[1], "/", i))
-  df <- ynabr:::getYNAB(paste0(basepoint, "/budgets/", budget_name_id[1], "/", i)) %>% 
-    ynabr:::removeColumnprefix()
+  df <- getYNAB(paste0(basepoint, "/budgets/", budget_name_id[1], "/", i)) %>% 
+    removeColumnprefix()
   
   if (i == "categories") {
     df <- df %>% rename(subcategories = categories)
@@ -48,7 +52,8 @@ getBudgetDetails <- function(i) {
         dayofmonth = lubridate::day(as.Date(date, "%Y-%m-%d")),
         category_name = trimws(gsub("[^[:alnum:][:space:][:punct:]]", "", category_name))
       )
-    df <- ynabr:::getUnsplit(df)
+    
+    df <- getUnsplit(df)
     
   }
   
