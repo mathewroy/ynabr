@@ -1,5 +1,6 @@
 #' A function that asks the user to select the budget of interest
 #' @keywords getToken
+#' @export
 #' @examples
 #' auth_token <- getToken()
 getToken <- function() {

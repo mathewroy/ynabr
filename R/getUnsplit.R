@@ -1,6 +1,7 @@
 #' Splits multiple category transactions stored in one row into individual rows
 #' @param d name of transactions data frame of interest
 #' @keywords getUnsplit
+#' @export
 #' @examples
 #' df <- getUnsplit(df_transactions) 
 getUnsplit <- function(d) {

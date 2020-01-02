@@ -1,5 +1,6 @@
 #' A function that asks the user to select the budget of interest
 #' @keywords selectBudget
+#' @export
 #' @examples
 #' budget_name_id <- selectBudget()
 selectBudget <- function() {

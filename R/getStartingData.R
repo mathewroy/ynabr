@@ -2,6 +2,7 @@
 #'  "user", "budgets"
 #' @param i name of endpoint
 #' @keywords getStartingData
+#' @export
 #' @examples
 #' df_user <- getStartingData("user")
 #' df_budgets <- getStartingData("budgets") 

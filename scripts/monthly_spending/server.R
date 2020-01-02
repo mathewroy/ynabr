@@ -1,5 +1,5 @@
 ## Load packages
-packages <- c("devtools","dplyr","ggplot2","htmltools","httr","jsonlite",
+packages <- c("devtools","dplyr","htmltools","httr","jsonlite",
               "magrittr","plotly","shiny","tidyr")
 sapply(packages, require, character.only = T)
   

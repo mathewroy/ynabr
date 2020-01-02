@@ -3,6 +3,7 @@
 #'  "subcategories", "scheduled_transactions", "transactions"
 #' @param i name of endpoint
 #' @keywords getBudgetDetails
+#' @export
 #' @examples
 #' df_accounts <- getBudgetDetails("accounts")
 #' df_categories <- getBudgetDetails("categories")

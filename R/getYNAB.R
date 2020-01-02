@@ -3,6 +3,7 @@
 #' Caution: Must be careful with use, as to not overal YNAB's servers
 #' @param YNAB.url Character vector of the endpoint URL of interest
 #' @keywords getYNAB
+#' @export
 #' @examples
 #' df <- getYNAB("https://api.youneedabudget.com/v1/user") 
 getYNAB <- function(YNAB.url) {

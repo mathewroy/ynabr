@@ -5,6 +5,7 @@
 #'      "something" > "something"
 #' @param x an R object, specifically an endpoint data frame
 #' @keywords removeColumnprefix
+#' @export
 #' @examples
 #' df_transactions <- getYNAB("https://api.youneedabudget.com/v1/transactions") %>% removeColumnprefix()
 removeColumnprefix <- function(x) {

@@ -3,6 +3,7 @@
 #' If there is no df_transactions data frame, it will create one.
 #' Caution: Must be careful with use, as to not overal YNAB's servers
 #' @keywords refreshTransactions
+#' @export
 #' @examples
 #' df_transactions <- refreshTransactions()
 refreshTransactions <- function() {
