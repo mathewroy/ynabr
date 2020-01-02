@@ -19,7 +19,6 @@ function(input, output) {
   
   mybudget <- reactive({
     auth_token <<- input$ip_token
-    df <- getStartingData("budgets")
   })
   
   observeEvent(input$ip_entertoken, {

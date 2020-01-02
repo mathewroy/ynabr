@@ -8,7 +8,7 @@
 
 ## User interface
 fluidPage(
-  titlePanel("YNABR Spending Tracker: Net spending as of nth day of month"),
+  titlePanel("ynabr Spending Tracker: Month-to-day spending compared to past months"),
   sidebarLayout(
     position = "right",
     sidebarPanel(
