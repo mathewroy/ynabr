@@ -61,7 +61,7 @@ df_transactions <- refreshTransactions() # OR
 df_transactions <- getBudgetDetails("transactions")
 ```
 
-### Monthly spending tracker (Shiny App)
+### Monthly spending tracker (Shiny App, run locally)
 Tracks the month-to-date spending by budget category.
 ```r
 # Load packages
@@ -71,3 +71,4 @@ sapply(packages, require, character.only = T)
 
 runGitHub(repo = "ynabr", username = "mathewroy", subdir = "scripts/monthly_spending")
 ```
+

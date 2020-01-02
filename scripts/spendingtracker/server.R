@@ -1,5 +1,5 @@
 ## Load packages
-packages <- c("devtools","dplyr","htmltools","httr","jsonlite",
+packages <- c("dplyr","htmltools","httr","jsonlite",
               "magrittr","plotly","shiny","tidyr")
 sapply(packages, require, character.only = T)
   
@@ -15,52 +15,48 @@ source("uifunctions.R")
 ## Server functions
 function(input, output) {
   ## Activity stats from data frame of interest
-  myreactivevals <- reactiveValues()
-  
-  mybudget <- reactive({
-    auth_token <<- input$ip_token
-    df_budgets <<- getStartingData("budgets")
-  })
+  revals <- reactiveValues()
   
   observeEvent(input$ip_entertoken, {
-    myreactivevals$nameid <- mybudget() %>% select(id, name)
-    myreactivevals$selection <- mybudget() %>% select(name)
+    rm(auth_token, df_budget)
+    auth_token <<- input$ip_token
+    df_budgets <<- getStartingData("budgets") %>% select(id, name)
+    revals$budgetnames <- df_budgets %>% select(name) # reactive required for output$op_budgetlist
   })
   
   output$op_budgetlist <- renderUI({ 
-    selectInput(inputId = "ip_budget", label = "Select a budget", choices = myreactivevals$selection)
+    selectInput(inputId = "ip_budget", label = "Select a budget", choices = revals$budgetnames)
   })
   
   observeEvent(input$ip_dltransactions, {
-    myreactivevals$selected <- input$ip_budget
-    budget_name_id <<- myreactivevals$nameid %>% as.data.frame %>% 
-      filter(name ==  myreactivevals$selected) %>% as.character()
-    df_categories <<- getBudgetDetails("categories")
-    df_transactions <<- getBudgetDetails("transactions")
-    myreactivevals$categories <- sort(unique(df_transactions$category_name))
-    myreactivevals$mindate <- min(df_transactions$date)
-    myreactivevals$maxdate <- max(df_transactions$date)
+    budget_name_id <<- df_budgets %>% filter(name ==  input$ip_budget) %>% as.character()
   })
 
+  reactive_transactions <- eventReactive(input$ip_dltransactions,{
+    rm(df_transactions)
+    df_transactions <- getBudgetDetails("transactions")
+    revals$mindate <- min(df_transactions$date)
+    revals$maxdate <- max(df_transactions$date)
+    revals$categories <- sort(unique(df_transactions$category_name))
+    return(df_transactions)
+  },ignoreNULL = T)
+  
   output$op_categories <- renderUI({ 
-    selectInput(inputId = "ip_categories", choices = myreactivevals$categories,
-                label = "Category", selected = "Dining Out", multiple = TRUE)
+    selectInput(inputId = "ip_categories", choices = revals$categories,
+                label = "Category", selected = revals$categories[1], multiple = TRUE)
   })
   
   output$op_dateranges <- renderUI({
     ## date range input
     dateRangeMonthsInput(inputId = "ip_daterange", label = "Time frame", 
-                         start = "2019-01-01", end = myreactivevals$maxdate, 
-                         min = myreactivevals$mindate, max = myreactivevals$maxdate, 
+                         start = "2019-01-01", end = revals$maxdate, 
+                         min = revals$mindate, max = revals$maxdate, 
                          minviewmode = "months", format = "yy-mm", startview = "year")
     
   })
   
-  ## Activity stats from data frame of interest
-  activity_stats <- reactiveValues()
-  
   ## Data frame of interest
-  df_of_interest <- reactive({
+  reactive_df_subset <- reactive({
     ## Create an empty dataset with the months and categories of interest
     yearmo <- strftime(seq(lubridate::floor_date(input$ip_daterange[1], "month"),
                            lubridate::ceiling_date(input$ip_daterange[2], "month") - 1,
@@ -72,7 +68,7 @@ function(input, output) {
     df_of_interest_01 <- merge(as.data.frame(yearmo), as.data.frame(category_name), all = TRUE)
     
     ## Get activity data for the months and categories of interest
-    df_of_interest_02 <- df_transactions %>% 
+    df_of_interest_02 <- reactive_transactions() %>% 
       filter(category_name %in% input$ip_categories, 
              date >= lubridate::floor_date(input$ip_daterange[1], "month"),
              date <= lubridate::ceiling_date(input$ip_daterange[2], "month") - 1,
@@ -99,15 +95,15 @@ function(input, output) {
     df_of_interest_stats <- df_of_interest_stats %>% 
       group_by(yearmo) %>% summarize(activity = sum(activity))
     
-    activity_stats$mean <-  mean(df_of_interest_stats$activity, na.rm = TRUE)
-    activity_stats$median <- median(df_of_interest_stats$activity, na.rm = TRUE)
-    activity_stats$min <- min(df_of_interest_stats$activity, na.rm = TRUE)
-    activity_stats$max <- max(df_of_interest_stats$activity, na.rm = TRUE)
+    revals$mean <-  mean(df_of_interest_stats$activity, na.rm = TRUE)
+    revals$median <- median(df_of_interest_stats$activity, na.rm = TRUE)
+    revals$min <- min(df_of_interest_stats$activity, na.rm = TRUE)
+    revals$max <- max(df_of_interest_stats$activity, na.rm = TRUE)
     
     if (nrow(na.omit(df_of_interest_stats)) >= 2) {
-      activity_stats$sd <- sd(df_of_interest_stats$activity, na.rm = TRUE)
+      revals$sd <- sd(df_of_interest_stats$activity, na.rm = TRUE)
     } else {
-      activity_stats$sd <- 0
+      revals$sd <- 0
       
     }
     
@@ -115,7 +111,7 @@ function(input, output) {
   })
   
   ## Create the output table
-  output$table <- renderDataTable(df_of_interest())
+  output$table <- renderDataTable(reactive_df_subset())
   
   ## Create output plot
   output$plotly <- renderPlotly({
@@ -130,34 +126,34 @@ function(input, output) {
     hlinefont <- list(color = 'rgba(0,0,0, 1)', width = 2)
     
     ## Create plot
-    p1 <- plot_ly(data = df_of_interest(), x =  ~ yearmo, y =  ~ activity,
+    p1 <- plot_ly(data = reactive_df_subset(), x =  ~ yearmo, y =  ~ activity,
                   type = 'bar', name =  ~ category_name, color =  ~ category_name) %>%
       layout(barmode = 'stack') %>%
       ## Line and text for Median
       add_segments(x =  ~ yearmo[1], xend = ~ yearmo, showlegend = FALSE, 
                    line = hlinefont, name = "Median", 
-                   y = activity_stats$median, yend = activity_stats$median) %>%
+                   y = revals$median, yend = revals$median) %>%
       layout(annotations = c(annotations, 
-                             list(text = paste('Median'), y = (activity_stats$median))))
+                             list(text = paste('Median'), y = (revals$median))))
     
-    if (activity_stats$sd >= 5) {
+    if (revals$sd >= 5) {
       p1 <-   p1 %>%
           ## Line and text for Mean - 1 SD
           add_segments(x = ~ yearmo[1], xend = ~ yearmo, showlegend = FALSE,
                        line = hlinefont, name = "Average - 1 SD", 
-                       y = (activity_stats$mean - activity_stats$sd),
-                       yend = (activity_stats$mean - activity_stats$sd)) %>%
+                       y = (revals$mean - revals$sd),
+                       yend = (revals$mean - revals$sd)) %>%
           layout(annotations = c(annotations, 
                                  list(text = paste('Average - 1 SD'),
-                                      y = (activity_stats$mean - activity_stats$sd)))) %>%
+                                      y = (revals$mean - revals$sd)))) %>%
           ## Line and text for Mean + 1 SD
           add_segments(x = ~ yearmo[1], xend = ~ yearmo, showlegend = FALSE, 
                        line = hlinefont, name = "Average + 1 SD", 
-                       y = (activity_stats$mean + activity_stats$sd),
-                       yend = (activity_stats$mean + activity_stats$sd)) %>%
+                       y = (revals$mean + revals$sd),
+                       yend = (revals$mean + revals$sd)) %>%
           layout(annotations = c(annotations, 
                                  list(text = paste('Average + 1 SD'),
-                                      y = (activity_stats$mean + activity_stats$sd))))
+                                      y = (revals$mean + revals$sd))))
       }
   
     ## Other layout features
@@ -165,7 +161,7 @@ function(input, output) {
       layout(
         xaxis = list(title = "Year-month", tickangle = 315),
         yaxis = list(title = "Net spending", tickprefix = "$",
-                     range = c(0, max(100,  ceiling(activity_stats$max / 50) * 50)))
+                     range = c(0, max(100,  ceiling(revals$max / 50) * 50)))
     )
     
   })

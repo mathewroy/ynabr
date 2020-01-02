@@ -1,4 +1,6 @@
-#' A function that asks the user to select the budget of interest
+#' Set personal access token
+#' 
+#' A function that asks the user to set their token
 #' @keywords getToken
 #' @export
 #' @examples

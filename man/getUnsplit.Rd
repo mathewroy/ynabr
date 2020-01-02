@@ -2,7 +2,7 @@
 % Please edit documentation in R/getUnsplit.R
 \name{getUnsplit}
 \alias{getUnsplit}
-\title{Splits multiple category transactions stored in one row into individual rows}
+\title{Unsplits multiple category transactions}
 \usage{
 getUnsplit(d)
 }

@@ -1,3 +1,5 @@
+#' Connect to YNAB API
+#' 
 #' Connects to YNAB API and converts JSON data to R data frames
 #' JSON content > text format > list format > R data frames
 #' Caution: Must be careful with use, as to not overal YNAB's servers

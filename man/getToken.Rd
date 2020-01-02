@@ -2,12 +2,12 @@
 % Please edit documentation in R/getToken.R
 \name{getToken}
 \alias{getToken}
-\title{A function that asks the user to select the budget of interest}
+\title{Set personal access token}
 \usage{
 getToken()
 }
 \description{
-A function that asks the user to select the budget of interest
+A function that asks the user to set their token
 }
 \examples{
 auth_token <- getToken()

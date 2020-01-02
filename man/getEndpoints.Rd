@@ -2,7 +2,7 @@
 % Please edit documentation in R/getEndpoints.R
 \name{getEndpoints}
 \alias{getEndpoints}
-\title{Returns the YNAB primary endpoints as a data frame}
+\title{Retrieve endpoints}
 \usage{
 getEndpoints()
 }

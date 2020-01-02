@@ -2,9 +2,7 @@
 % Please edit documentation in R/getYNAB.R
 \name{getYNAB}
 \alias{getYNAB}
-\title{Connects to YNAB API and converts JSON data to R data frames
-JSON content > text format > list format > R data frames
-Caution: Must be careful with use, as to not overal YNAB's servers}
+\title{Connect to YNAB API}
 \usage{
 getYNAB(YNAB.url)
 }

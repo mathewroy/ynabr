@@ -2,14 +2,12 @@
 % Please edit documentation in R/getBudgetDetails.R
 \name{getBudgetDetails}
 \alias{getBudgetDetails}
-\title{Gets the following YNAB data for a pre-specified budget:
- "accounts", "categories", "months", "payees", "payee_locations", 
- "subcategories", "scheduled_transactions", "transactions"}
+\title{Get budget details}
 \usage{
 getBudgetDetails(i)
 }
 \arguments{
-\item{i}{name of endpoint}
+\item{i}{name of endpoint (one of: "accounts", "categories", "months", "payees", "payee_locations", "subcategories", "scheduled_transactions", "transactions")}
 }
 \description{
 Gets the following YNAB data for a pre-specified budget:
@@ -17,13 +15,6 @@ Gets the following YNAB data for a pre-specified budget:
  "subcategories", "scheduled_transactions", "transactions"
 }
 \examples{
-df_accounts <- getBudgetDetails("accounts")
-df_categories <- getBudgetDetails("categories")
-df_subcategories <- getBudgetDetails("subcategories")
-df_months <- getBudgetDetails("months")
-df_payees <- getBudgetDetails("payees")
-df_payee_locations <- getBudgetDetails("payee_locations")
-df_scheduled_transactions <- getBudgetDetails("scheduled_transactions")
 df_transactions <- getBudgetDetails("transactions")
 }
 \keyword{getBudgetDetails}

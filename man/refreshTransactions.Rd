@@ -2,15 +2,11 @@
 % Please edit documentation in R/refreshTransactions.R
 \name{refreshTransactions}
 \alias{refreshTransactions}
-\title{Updates the YNAB transaction data
-Adds new transactions, deletes exisiting or modifies existing transactions.
-If there is no df_transactions data frame, it will create one.
-Caution: Must be careful with use, as to not overal YNAB's servers}
+\title{Updates the YNAB transaction data}
 \usage{
 refreshTransactions()
 }
 \description{
-Updates the YNAB transaction data
 Adds new transactions, deletes exisiting or modifies existing transactions.
 If there is no df_transactions data frame, it will create one.
 Caution: Must be careful with use, as to not overal YNAB's servers

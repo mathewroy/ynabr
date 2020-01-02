@@ -2,8 +2,7 @@
 % Please edit documentation in R/getStartingData.R
 \name{getStartingData}
 \alias{getStartingData}
-\title{Gets the following YNAB data for a YNAB subscriber:
- "user", "budgets"}
+\title{Retrieves user or budget names}
 \usage{
 getStartingData(i)
 }

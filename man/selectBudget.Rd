@@ -2,7 +2,7 @@
 % Please edit documentation in R/selectBudget.R
 \name{selectBudget}
 \alias{selectBudget}
-\title{A function that asks the user to select the budget of interest}
+\title{Select a budget}
 \usage{
 selectBudget()
 }

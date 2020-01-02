@@ -1,3 +1,5 @@
+#' Unsplits multiple category transactions
+#' 
 #' Splits multiple category transactions stored in one row into individual rows
 #' @param d name of transactions data frame of interest
 #' @keywords getUnsplit

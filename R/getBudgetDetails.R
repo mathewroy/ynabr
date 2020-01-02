@@ -1,17 +1,14 @@
+#' Get budget details
+#' 
 #' Gets the following YNAB data for a pre-specified budget:
 #'  "accounts", "categories", "months", "payees", "payee_locations", 
 #'  "subcategories", "scheduled_transactions", "transactions"
-#' @param i name of endpoint
+#' 
+#' @param i name of endpoint (one of: "accounts", "categories", "months", "payees", "payee_locations", "subcategories", "scheduled_transactions", "transactions")
 #' @keywords getBudgetDetails
 #' @export
+#' 
 #' @examples
-#' df_accounts <- getBudgetDetails("accounts")
-#' df_categories <- getBudgetDetails("categories")
-#' df_subcategories <- getBudgetDetails("subcategories")
-#' df_months <- getBudgetDetails("months")
-#' df_payees <- getBudgetDetails("payees")
-#' df_payee_locations <- getBudgetDetails("payee_locations")
-#' df_scheduled_transactions <- getBudgetDetails("scheduled_transactions")
 #' df_transactions <- getBudgetDetails("transactions")
 getBudgetDetails <- function(i) {
   

@@ -1,3 +1,5 @@
+#' Fix column names
+#' 
 #' Removes the prefix "data.{endpoint}." from column names in data frames created by getYNAB()
 #' The assumption is that the name will follow the structure "data.{x}.something"
 #' eg.  "data.{x}.something" > "something" or

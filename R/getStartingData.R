@@ -1,3 +1,5 @@
+#' Retrieves user or budget names
+#' 
 #' Gets the following YNAB data for a YNAB subscriber:
 #'  "user", "budgets"
 #' @param i name of endpoint

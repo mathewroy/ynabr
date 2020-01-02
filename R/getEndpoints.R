@@ -1,6 +1,10 @@
+#' Retrieve endpoints
+#' 
 #' Returns the YNAB primary endpoints as a data frame
+#' 
 #' @keywords getEndpoints
 #' @export
+#' 
 #' @examples
 #' getEndpoints()
 ## Create URL segments for each endpoint
