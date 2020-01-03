@@ -44,6 +44,9 @@ fluidPage(
                   tabPanel("Plot", plotlyOutput("plotly")),
                   tabPanel("Table", dataTableOutput("table")),
                   tabPanel("Notes",
+                           h3("Disclaimer"),
+                           p("This app is not sponsored, endorsed or supported by ",
+                             tags$a(href="https://www.youneedabudget.com", "You Need A Budget.")),
                            h3("Description"),
                            p("This app tracks your spending across budget categories and 
                              shows the typical net spending based on the budget, budget categories, 
@@ -56,11 +59,10 @@ fluidPage(
                              "Click on New Token, enter your password, and Click Generate"),
                            h3("Privacy"),
                            p("From shinyapps.io: 'shinyapps.io is secure-by-design. Each Shiny application runs 
-                             in its own protected environment and access is always SSL encrypted'.
-                             To visualize your data, it is temporarily stored on the secure shinnyapps.io servers for 
-                             the length of the usage session. 
-                             Only you, the user, have access to your own token and associated data. 
-                             After the instance of this app is ended (closed), your data is no longer kept on the servers."),
+                             in its own protected environment and access is always SSL encrypted'."),
+                           p("The data is only temporarily stored on the secure shinnyapps.io servers for 
+                             the length of the usage session."),
+                           p("After the instance of this app is ended (closed), your data is no longer kept on the servers."),
                            h3("Author"),
                            p("Mathew Roy:",
                              tags$a(href="https://www.linkedin.com/in/matroy","[My LinkedIn Profile]"),
