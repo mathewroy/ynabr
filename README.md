@@ -65,10 +65,6 @@ df_transactions <- getBudgetDetails("transactions")
 Tracks the month-to-date spending by budget category.
 ```r
 # Load packages
-packages <- c("devtools","dplyr","ggplot2","htmltools","httr","jsonlite",
-              "magrittr","plotly","shiny","tidyr", "ynabr")
-sapply(packages, require, character.only = T)
-
+library(shiny)
 runGitHub(repo = "ynabr", username = "mathewroy", subdir = "scripts/monthly_spending")
 ```
-

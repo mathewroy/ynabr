@@ -14,29 +14,36 @@ source("uifunctions.R")
 
 ## Server functions
 function(input, output) {
+  
   ## Activity stats from data frame of interest
   revals <- reactiveValues()
   
   observeEvent(input$ip_entertoken, {
-    rm(auth_token, df_budget)
-    auth_token <<- input$ip_token
-    df_budgets <<- getStartingData("budgets") %>% select(id, name)
-    revals$budgetnames <- df_budgets %>% select(name) # reactive required for output$op_budgetlist
+    revals$auth_token <- input$ip_token
+    rm(auth_token)
+    auth_token <<- revals$auth_token
+    revals$budgetnames <- getStartingData("budgets") %>% select(id, name) # reactive required for output$op_budgetlist
+    revals$mychoices <- revals$budgetnames %>% select(name)
+    rm(auth_token)
   })
   
   output$op_budgetlist <- renderUI({ 
-    selectInput(inputId = "ip_budget", label = "Select a budget", choices = revals$budgetnames)
+    selectInput(inputId = "ip_budget", label = "Select a budget", choices = revals$mychoices)
   })
   
   observeEvent(input$ip_dltransactions, {
-    budget_name_id <<- df_budgets %>% filter(name ==  input$ip_budget) %>% as.character()
+    revals$budget_name_id <- revals$budgetnames %>% filter(name ==  input$ip_budget) %>% as.character()
   })
 
   reactive_transactions <- eventReactive(input$ip_dltransactions,{
-    rm(df_transactions)
+    auth_token <- revals$auth_token
+    rm(budget_name_id)
+    budget_name_id <<- revals$budget_name_id 
+    
     df_transactions <- getBudgetDetails("transactions")
-    revals$mindate <- min(df_transactions$date)
-    revals$maxdate <- max(df_transactions$date)
+    
+    revals$mindate <- min(df_transactions$date,na.rm = T)
+    revals$maxdate <- max(df_transactions$date, na.rm = T)
     revals$categories <- sort(unique(df_transactions$category_name))
     return(df_transactions)
   },ignoreNULL = T)
@@ -58,10 +65,10 @@ function(input, output) {
   ## Data frame of interest
   reactive_df_subset <- reactive({
     ## Create an empty dataset with the months and categories of interest
-    yearmo <- strftime(seq(lubridate::floor_date(input$ip_daterange[1], "month"),
-                           lubridate::ceiling_date(input$ip_daterange[2], "month") - 1,
-                           by = ("1 month")),
-                       "%y-%m")
+    yearmo <- strftime(x = seq(from = lubridate::floor_date(input$ip_daterange[1], "month"),
+                               to = lubridate::ceiling_date(input$ip_daterange[2], "month") - 1,
+                               by = "1 month"), 
+                       format = "%y-%m")
     
     category_name <- input$ip_categories
     
@@ -92,8 +99,7 @@ function(input, output) {
       df_of_interest_stats <- df_of_interest
     }
     
-    df_of_interest_stats <- df_of_interest_stats %>% 
-      group_by(yearmo) %>% summarize(activity = sum(activity))
+    df_of_interest_stats <- df_of_interest_stats %>% group_by(yearmo) %>% summarize(activity = sum(activity))
     
     revals$mean <-  mean(df_of_interest_stats$activity, na.rm = TRUE)
     revals$median <- median(df_of_interest_stats$activity, na.rm = TRUE)
@@ -104,7 +110,6 @@ function(input, output) {
       revals$sd <- sd(df_of_interest_stats$activity, na.rm = TRUE)
     } else {
       revals$sd <- 0
-      
     }
     
     return(df_of_interest)
@@ -133,8 +138,7 @@ function(input, output) {
       add_segments(x =  ~ yearmo[1], xend = ~ yearmo, showlegend = FALSE, 
                    line = hlinefont, name = "Median", 
                    y = revals$median, yend = revals$median) %>%
-      layout(annotations = c(annotations, 
-                             list(text = paste('Median'), y = (revals$median))))
+      layout(annotations = c(annotations, list(text = paste('Median'), y = (revals$median))))
     
     if (revals$sd >= 5) {
       p1 <-   p1 %>%
@@ -143,16 +147,14 @@ function(input, output) {
                        line = hlinefont, name = "Average - 1 SD", 
                        y = (revals$mean - revals$sd),
                        yend = (revals$mean - revals$sd)) %>%
-          layout(annotations = c(annotations, 
-                                 list(text = paste('Average - 1 SD'),
+          layout(annotations = c(annotations, list(text = paste('Average - 1 SD'),
                                       y = (revals$mean - revals$sd)))) %>%
           ## Line and text for Mean + 1 SD
           add_segments(x = ~ yearmo[1], xend = ~ yearmo, showlegend = FALSE, 
                        line = hlinefont, name = "Average + 1 SD", 
                        y = (revals$mean + revals$sd),
                        yend = (revals$mean + revals$sd)) %>%
-          layout(annotations = c(annotations, 
-                                 list(text = paste('Average + 1 SD'),
+          layout(annotations = c(annotations,  list(text = paste('Average + 1 SD'),
                                       y = (revals$mean + revals$sd))))
       }
   
@@ -165,4 +167,5 @@ function(input, output) {
     )
     
   })
+  
 }

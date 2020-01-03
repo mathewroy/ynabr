@@ -4,6 +4,7 @@ _config.yml
 .RData
 .Ruserdata
 token.txt
+shinyappstoken.txt
 ynabr.Rproj
 scripts/scraps
 scripts/spendingtracker/rsconnect
