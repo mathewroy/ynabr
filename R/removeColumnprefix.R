@@ -5,11 +5,10 @@
 #' eg.  "data.{x}.something" > "something" or
 #'      "data.something" > "something" or
 #'      "something" > "something"
+#' @name removeColumnprefix
 #' @param x an R object, specifically an endpoint data frame
 #' @keywords removeColumnprefix
 #' @export
-#' @examples
-#' df_transactions <- getYNAB("https://api.youneedabudget.com/v1/transactions") %>% removeColumnprefix()
 removeColumnprefix <- function(x) {
   df_name <- deparse(substitute(x))
   

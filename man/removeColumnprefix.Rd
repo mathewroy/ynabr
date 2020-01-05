@@ -16,7 +16,4 @@ eg.  "data.{x}.something" > "something" or
      "data.something" > "something" or
      "something" > "something"
 }
-\examples{
-df_transactions <- getYNAB("https://api.youneedabudget.com/v1/transactions") \%>\% removeColumnprefix()
-}
 \keyword{removeColumnprefix}

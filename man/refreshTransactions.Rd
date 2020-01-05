@@ -3,15 +3,16 @@
 \name{refreshTransactions}
 \alias{refreshTransactions}
 \title{Updates the YNAB transaction data}
-\usage{
-refreshTransactions()
+\arguments{
+\item{param.token}{Your YNAB API personal access token}
+
+\item{param.budgetid}{The ID associated with the selected budget}
+
+\item{param.dfname}{(optional) Name of data frame which contains existing transactions}
 }
 \description{
 Adds new transactions, deletes exisiting or modifies existing transactions.
 If there is no df_transactions data frame, it will create one.
-Caution: Must be careful with use, as to not overal YNAB's servers
-}
-\examples{
-df_transactions <- refreshTransactions()
+Caution: Must be careful with use, as to not overload YNAB's servers.
 }
 \keyword{refreshTransactions}

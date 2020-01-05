@@ -19,28 +19,25 @@ function(input, output) {
   revals <- reactiveValues()
   
   observeEvent(input$ip_entertoken, {
-    revals$auth_token <- input$ip_token
-    rm(auth_token)
-    auth_token <<- revals$auth_token
-    revals$budgetnames <- getStartingData("budgets") %>% select(id, name) # reactive required for output$op_budgetlist
-    revals$mychoices <- revals$budgetnames %>% select(name)
-    rm(auth_token)
+    revals$mytoken <- input$ip_token
+    revals$budgets <- getStartingData(i = "budgets",param.token = revals$mytoken) %>% 
+      select(id, name) # reactive required for output$op_budgetlist
+    revals$budgetnames <- revals$budgets %>% select(name)
   })
   
   output$op_budgetlist <- renderUI({ 
-    selectInput(inputId = "ip_budget", label = "Select a budget", choices = revals$mychoices)
+    selectInput(inputId = "ip_budget", label = "Select a budget", choices = revals$budgetnames)
   })
   
   observeEvent(input$ip_dltransactions, {
-    revals$budget_name_id <- revals$budgetnames %>% filter(name ==  input$ip_budget) %>% as.character()
+    revals$mybudgetid <- revals$budgets %>% filter(name ==  input$ip_budget) %>% select(id) %>% as.character()
   })
 
   reactive_transactions <- eventReactive(input$ip_dltransactions,{
-    auth_token <- revals$auth_token
-    rm(budget_name_id)
-    budget_name_id <<- revals$budget_name_id 
     
-    df_transactions <- getBudgetDetails("transactions")
+    df_transactions <- getBudgetDetails("transactions",
+                                        param.token = revals$mytoken,
+                                        param.budgetid = revals$mybudgetid)
     
     revals$mindate <- min(df_transactions$date,na.rm = T)
     revals$maxdate <- max(df_transactions$date, na.rm = T)
@@ -120,6 +117,7 @@ function(input, output) {
   
   ## Create output plot
   output$plotly <- renderPlotly({
+    tryCatch({
     ## Formatting for text annotations for statistics
     annotations = list(
       xref = "yearmo",  x = ~ yearmo[1],  xanchor = 'right',  yanchor = 'middle',
@@ -165,7 +163,10 @@ function(input, output) {
         yaxis = list(title = "Net spending", tickprefix = "$",
                      range = c(0, max(100,  ceiling(revals$max / 50) * 50)))
     )
-    
+    },
+    warning=function(w){
+      message(w)
+    })  
   })
   
 }

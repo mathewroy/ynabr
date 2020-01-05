@@ -3,11 +3,10 @@
 \name{getYNAB}
 \alias{getYNAB}
 \title{Connect to YNAB API}
-\usage{
-getYNAB(YNAB.url)
-}
 \arguments{
-\item{YNAB.url}{Character vector of the endpoint URL of interest}
+\item{param.url}{Character vector of the endpoint URL of interest}
+
+\item{param.token}{Your YNAB API personal access token}
 }
 \description{
 Connects to YNAB API and converts JSON data to R data frames
@@ -15,6 +14,8 @@ JSON content > text format > list format > R data frames
 Caution: Must be careful with use, as to not overal YNAB's servers
 }
 \examples{
-df <- getYNAB("https://api.youneedabudget.com/v1/user") 
+url <- "https://api.youneedabudget.com/v1/user"
+mytoken <- "1234567890ABCDE"
+df <- getYNAB(param.url = url, param.token = mytoken)
 }
 \keyword{getYNAB}

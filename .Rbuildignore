@@ -1,2 +1,6 @@
 ^ynabr\.Rproj$
 ^\.Rproj\.user$
+^_config\.yml$
+^scripts$
+^token.txt$
+^shinyappstoken.txt$

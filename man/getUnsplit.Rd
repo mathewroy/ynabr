@@ -3,16 +3,10 @@
 \name{getUnsplit}
 \alias{getUnsplit}
 \title{Unsplits multiple category transactions}
-\usage{
-getUnsplit(d)
-}
 \arguments{
 \item{d}{name of transactions data frame of interest}
 }
 \description{
 Splits multiple category transactions stored in one row into individual rows
-}
-\examples{
-df <- getUnsplit(df_transactions) 
 }
 \keyword{getUnsplit}

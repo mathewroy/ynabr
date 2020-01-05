@@ -4,17 +4,20 @@
 \alias{getStartingData}
 \title{Retrieves user or budget names}
 \usage{
-getStartingData(i)
+getStartingData(i, param.token)
 }
 \arguments{
 \item{i}{name of endpoint}
+
+\item{param.token}{Your YNAB API personal access token}
 }
 \description{
 Gets the following YNAB data for a YNAB subscriber:
  "user", "budgets"
 }
 \examples{
-df_user <- getStartingData("user")
-df_budgets <- getStartingData("budgets") 
+endpoint <- "budgets"
+mytoken <- "1234567890ABCDE"
+df_budgets <- getStartingData(i = endpoint, param.token = mytoken) 
 }
 \keyword{getStartingData}

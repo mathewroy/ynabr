@@ -1,10 +1,11 @@
 #' Retrieve endpoints
 #' 
 #' Returns the YNAB primary endpoints as a data frame
-#' 
+#' @name getEndpoints
 #' @keywords getEndpoints
 #' @export
-#' 
+#' @import dplyr
+#' @importFrom magrittr %>%
 #' @examples
 #' getEndpoints()
 ## Create URL segments for each endpoint
@@ -20,8 +21,8 @@ getEndpoints <- function() {
       "months",
       "transactions",
       "scheduled_transactions"
-    ) %>%
-    tibble(ep = ., urls = c(lapply(., function(x)
+    )
+  df2 <- tibble(ep = df, urls = c(lapply(df, function(x)
       paste0("/", x))))
-  return(df)
+  return(df2)
 }

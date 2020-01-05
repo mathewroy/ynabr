@@ -5,7 +5,7 @@ library(plotly)
 ##          for budget categories of interest and
 ##          compares it to historical spending as of the day of the month.
 ## Created on: November 5, 2018
-## Updated on: January 2, 2020
+## Updated on: January 4, 2020
 
 ## User interface
 fluidPage(

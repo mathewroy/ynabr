@@ -2,20 +2,44 @@
 #' 
 #' Gets the following YNAB data for a YNAB subscriber:
 #'  "user", "budgets"
+#' @name getStartingData
 #' @param i name of endpoint
+#' @param param.token Your YNAB API personal access token
 #' @keywords getStartingData
 #' @export
+#' @import dplyr
 #' @examples
-#' df_user <- getStartingData("user")
-#' df_budgets <- getStartingData("budgets") 
-getStartingData <- function(i) {
+#' endpoint <- "budgets"
+#' mytoken <- "1234567890ABCDE"
+#' df_budgets <- getStartingData(i = endpoint, param.token = mytoken) 
+
+# Version: 0.0.1.0000
+# getStartingData <- function(i) {
+#   basepoint <- c("https://api.youneedabudget.com/v1")
+#   
+#   if (!(i %in% c("user", "budgets"))) {
+#     stop("Please enter the arguments 'user' or 'budgets'.")
+#   }
+#   print(paste0("Getting data from: ", basepoint, "/", i))
+#   df <- getYNAB(paste0(basepoint, "/", i)) %>% 
+#     removeColumnprefix()
+#   return(df)
+# }
+
+# Version: 0.1.0.0000
+# Added new parameter for token
+getStartingData <- function(i, param.token) {
   basepoint <- c("https://api.youneedabudget.com/v1")
   
   if (!(i %in% c("user", "budgets"))) {
     stop("Please enter the arguments 'user' or 'budgets'.")
   }
-  print(paste0("Getting data from: ", basepoint, "/", i))
-  df <- getYNAB(paste0(basepoint, "/", i)) %>% 
-    removeColumnprefix()
+  
+  myurl <- paste0(basepoint, "/", i)
+  mytoken <- param.token
+  
+  print(paste0("Getting data from: ", myurl))
+  
+  df <- getYNAB(param.url = myurl, param.token = mytoken) %>% removeColumnprefix()
   return(df)
 }

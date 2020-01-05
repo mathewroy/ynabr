@@ -1,8 +1,10 @@
 #' Set personal access token
 #' 
 #' A function that asks the user to set their token
+#' @name getToken
 #' @keywords getToken
 #' @export
+#' @import dplyr
 #' @examples
 #' auth_token <- getToken()
 getToken <- function() {

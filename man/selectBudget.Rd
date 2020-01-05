@@ -3,13 +3,10 @@
 \name{selectBudget}
 \alias{selectBudget}
 \title{Select a budget}
-\usage{
-selectBudget()
+\arguments{
+\item{param.token}{Your YNAB API personal access token}
 }
 \description{
 A function that asks the user to select the budget of interest
-}
-\examples{
-budget_name_id <- selectBudget()
 }
 \keyword{selectBudget}
