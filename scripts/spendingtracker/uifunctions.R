@@ -1,3 +1,6 @@
+## Updated on: February 10, 2020
+## With help from sources acknowledged below
+
 ## Date range picker (using months only)
 ## Source: https://stackoverflow.com/a/38974106/9697283
 dateRangeMonthsInput <- function(inputId, label, 

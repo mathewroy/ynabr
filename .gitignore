@@ -8,3 +8,4 @@ shinyappstoken.txt
 ynabr.Rproj
 scripts/scraps
 scripts/spendingtracker/rsconnect
+scripts/spendingtracker/global.R

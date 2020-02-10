@@ -1,31 +1,49 @@
+## Author: Mathew Roy
+## Updated on: February 10, 2020
+## With help from sources acknowledged below
+
 ## Load packages
-packages <- c("dplyr","htmltools","httr","jsonlite",
-              "magrittr","plotly","shiny","tidyr")
+packages <- c("dplyr","htmltools","plotly","httr","jsonlite",
+              "magrittr","shiny","tidyr")
 sapply(packages, require, character.only = T)
   
 ## Loading ynabr fucntions (development)
 #function_files <- dir(path = "R\\", pattern = "*.R$", full.names = T)
 #lapply(function_files, source, echo = F, print.eval = F, verbose = F)
 
+# When not in development
 library(ynabr)
 
 # Load required functions
 source("uifunctions.R")
 
 ## Server functions
-function(input, output) {
+# Ouath integrattion source: Hadley Wickham's github-oauth example script
+function(input, output, session) {
+  
+  params <- parseQueryString(isolate(session$clientData$url_search))
+  
+  if (!has_auth_code(params)) {
+    return()
+  }
+  
+  # Manually create a token
+  token <- httr::oauth2.0_token(
+    app = app,
+    endpoint = api,
+    credentials = httr::oauth2.0_access_token(endpoint = api, app = app, code = params$code),
+    cache = TRUE
+  )
   
   ## Activity stats from data frame of interest
   revals <- reactiveValues()
   
-  observeEvent(input$ip_entertoken, {
-    revals$mytoken <- input$ip_token
-    revals$budgets <- getStartingData(i = "budgets",param.token = revals$mytoken) %>% 
-      select(id, name) # reactive required for output$op_budgetlist
-    revals$budgetnames <- revals$budgets %>% select(name)
-  })
-  
+  budgets_df <- getStartingData(i = "budgets", param.token.code = NULL, param.token.env = token)
+
   output$op_budgetlist <- renderUI({ 
+    revals$budgets <- budgets_df %>%select(id, name) # reactive required for output$op_budgetlist
+    revals$budgetnames <- revals$budgets %>% select(name)
+    
     selectInput(inputId = "ip_budget", label = "Select a budget", choices = revals$budgetnames)
   })
   
@@ -34,12 +52,12 @@ function(input, output) {
   })
 
   reactive_transactions <- eventReactive(input$ip_dltransactions,{
+    df_transactions <- getBudgetDetails(i = "transactions",
+                                             param.token.code = NULL, 
+                                             param.token.env = token,
+                                             param.budgetid = revals$mybudgetid)
     
-    df_transactions <- getBudgetDetails("transactions",
-                                        param.token = revals$mytoken,
-                                        param.budgetid = revals$mybudgetid)
-    
-    revals$mindate <- min(df_transactions$date,na.rm = T)
+  revals$mindate <- min(df_transactions$date,na.rm = T)
     revals$maxdate <- max(df_transactions$date, na.rm = T)
     revals$categories <- sort(unique(df_transactions$category_name))
     return(df_transactions)

@@ -1,30 +1,20 @@
-library(plotly)
-## Title: ynabR: Track Monthly Spending App
 ## Author: Mathew Roy
-## Comment: Displays monthly spending amounts between a start and end date,
-##          for budget categories of interest and
-##          compares it to historical spending as of the day of the month.
-## Created on: November 5, 2018
-## Updated on: January 4, 2020
+## Updated on: February 10, 2020
+## With help from sources acknowledged below
 
+library(plotly)
 ## User interface
-fluidPage(
+ui <- fluidPage(
   titlePanel("Month-to-day spending tracker app for YNAB"),
   sidebarLayout(
     position = "right",
     sidebarPanel(
-      ## token input
-      textInput(inputId = "ip_token", label = "YNAB Personal Access Token",
-                value = ""),
-      
-      ## enter token
-      actionButton(inputId = "ip_entertoken", "1. Submit token"),
-      
+     
       ## budget input
       htmlOutput(outputId = "op_budgetlist"),
       
       ## select budget
-      actionButton(inputId = "ip_dltransactions", "2. Choose this budget"),
+      actionButton(inputId = "ip_dltransactions", "1. Select this budget"),
       
       htmlOutput(outputId = "op_categories"),
       
@@ -43,10 +33,7 @@ fluidPage(
       tabsetPanel(type = "tabs",
                   tabPanel("Plot", plotlyOutput("plotly")),
                   tabPanel("Table", dataTableOutput("table")),
-                  tabPanel("Notes",
-                           h3("Disclaimer"),
-                           p("This app is not sponsored, endorsed or supported by ",
-                             tags$a(href="https://www.youneedabudget.com", "You Need A Budget.")),
+                  tabPanel("Notes & Privacy",
                            h3("Description"),
                            p("This app tracks your spending across budget categories and 
                              shows the typical net spending based on the budget, budget categories, 
@@ -54,21 +41,36 @@ fluidPage(
                              insights on my spending habits and also to learn Shiny. I hope you find it useful.
                              This project is open-source and you can find more information about it in the 'scripts' 
                              subdirectory of my GitHub page (see below)."),
-                           p("To obtain your personal access token, Sign in to YNAB > My Account > ",
-                             tags$a(href="https://app.youneedabudget.com/settings/developer", "Developer Settings."),
-                             "Click on New Token, enter your password, and Click Generate"),
                            h3("Privacy"),
                            p("From shinyapps.io: 'shinyapps.io is secure-by-design. Each Shiny application runs 
                              in its own protected environment and access is always SSL encrypted'."),
                            p("The data is only temporarily stored on the secure shinnyapps.io servers for 
                              the length of the usage session."),
                            p("After the instance of this app is ended (closed), your data is no longer kept on the servers."),
+                           p("Your data will not be transferred to any third party."),
+                           h3("Disclaimer"),
+                           p("This app is not sponsored, endorsed or supported by ",
+                             tags$a(href="https://www.youneedabudget.com", "You Need A Budget.")),
                            h3("Author"),
                            p("Mathew Roy:",
                              tags$a(href="https://www.linkedin.com/in/matroy","[My LinkedIn Profile]"),
                              tags$a(href="https://github.com/mathewroy/ynabr","[ynabr GitHub]"))
                            )
-                  )
+                           )
     )
   )
 )
+
+# Source: Hadley Wickham's github-oauth example script
+uiFunc <- function(req) {
+  if (!has_auth_code(parseQueryString(req$QUERY_STRING))) {
+    
+    url <- httr::oauth2.0_authorize_url(api, app, scope = scope)
+    redirect <- sprintf("location.replace(\"%s\");", url)
+    tags$script(HTML(redirect))
+    
+  } else {
+    ui
+  }
+}
+
