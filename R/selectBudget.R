@@ -40,13 +40,16 @@ if(getRversion() >= "2.15.1")  utils::globalVariables(c("."))
 #   return(c(budget_id, budget_name))
 # }
 
+# Version: 0.1.1.0000
+# Added new parameter for token environment, rename param.token to param.token.code and mytoken to mytoken.code
 # Version: 0.1.0.0000
 # Added parameter token
 # Changed how budget names are printed
-selectBudget <- function(param.token) {
-  mytoken <- param.token
+selectBudget <- function(param.token.code, param.token.env) {
+  mytoken.code <- param.token.code
+  mytoken.env <- param.token.env
   
-  df_budgets <- getStartingData(i = "budgets", param.token = mytoken)
+  df_budgets <- getStartingData(i = "budgets", param.token.code = mytoken.code, param.token.env = mytoken.env)
   
   if (length(df_budgets$id) > 1) {
     print("Enter the number associated with the budgest of interest:")

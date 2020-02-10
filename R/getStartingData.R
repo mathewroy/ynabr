@@ -26,9 +26,11 @@
 #   return(df)
 # }
 
+# Version: 0.1.1.0000
+# Added new parameter for token environment, rename param.token to param.token.code and mytoken to mytoken.code
 # Version: 0.1.0.0000
 # Added new parameter for token
-getStartingData <- function(i, param.token) {
+getStartingData <- function(i, param.token.code, param.token.env) {
   basepoint <- c("https://api.youneedabudget.com/v1")
   
   if (!(i %in% c("user", "budgets"))) {
@@ -36,10 +38,11 @@ getStartingData <- function(i, param.token) {
   }
   
   myurl <- paste0(basepoint, "/", i)
-  mytoken <- param.token
+  mytoken.code <- param.token.code
+  mytoken.env <- param.token.env
   
   print(paste0("Getting data from: ", myurl))
   
-  df <- getYNAB(param.url = myurl, param.token = mytoken) %>% removeColumnprefix()
+  df <- getYNAB(param.url = myurl, param.token.code = mytoken.code, param.token.env = mytoken.env) %>% removeColumnprefix()
   return(df)
 }

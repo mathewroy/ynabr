@@ -4,7 +4,7 @@
 \alias{refreshTransactions}
 \title{Updates the YNAB transaction data}
 \arguments{
-\item{param.token}{Your YNAB API personal access token}
+\item{param.token.code}{Your YNAB API personal access token}
 
 \item{param.budgetid}{The ID associated with the selected budget}
 

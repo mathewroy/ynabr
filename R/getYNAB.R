@@ -44,14 +44,39 @@ if(getRversion() >= "2.15.1")  utils::globalVariables(c("."))
 # Added new parameter for token
 # Removed use of glue from glue package
 # Changed name of final output
-getYNAB <- function(param.url, param.token) {
-  myurl <- param.url
-  mytoken <- param.token
+# getYNAB <- function(param.url, param.token) {
+#   myurl <- param.url
+#   mytoken <- param.token
+# 
+#   df_json <-
+#     httr::GET(url = myurl, add_headers(Authorization = paste("bearer",mytoken))) %>%
+#     content(as = "text") %>%
+#     jsonlite::fromJSON(flatten = TRUE)
+#   
+#   
+#   if (any(names(df_json[["data"]]) %in% c("user", "budgets"))) {
+#     df <- df_json[["data"]] %>% .[[1]]
+#   } else {
+#     df <- df_json %>% as.data.frame()
+#   }
+#   
+#   return(df)
+# }
 
-  df_json <-
-    httr::GET(url = myurl, add_headers(Authorization = paste("bearer",mytoken))) %>%
-    content(as = "text") %>%
-    jsonlite::fromJSON(flatten = TRUE)
+# Version: 0.1.1.0000
+# Added new parameter for token environment, rename param.token to param.token.code and mytoken to mytoken.code
+getYNAB <- function(param.url, param.token.code, param.token.env) {
+  myurl <- param.url
+  mytoken.code <- param.token.code
+  mytoken.env <- param.token.env
+  
+  if (is.null(param.token.env)){
+    df_json <- httr::GET(url = myurl, add_headers(Authorization = paste("bearer",mytokencode)))
+  } else {
+    df_json <- httr::GET(url = myurl, httr::config(token = mytoken.env))
+  }
+  
+  df_json <- df_json %>% content(as = "text") %>% jsonlite::fromJSON(flatten = TRUE)
   
   
   if (any(names(df_json[["data"]]) %in% c("user", "budgets"))) {
@@ -62,3 +87,4 @@ getYNAB <- function(param.url, param.token) {
   
   return(df)
 }
+

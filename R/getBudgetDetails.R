@@ -81,10 +81,12 @@ if(getRversion() >= "2.15.1")  utils::globalVariables(c(".","budget_name_id"))
 #   return(df)
 # }
 
+# Version: 0.1.1.0000
+# Added new parameter for token environment, rename param.token to param.token.code and mytoken to mytoken.code
 # Version: 0.1.0.0000
 # Added new parameter for token
 # Added new parameter for budget id
-getBudgetDetails <- function(i, param.token, param.budgetid) {
+getBudgetDetails <- function(i, param.token.code, param.token.env, param.budgetid) {
   
   valid_i <-  c("accounts", "categories", "months", "payees", "payee_locations", 
                 "subcategories", "scheduled_transactions", "transactions")
@@ -102,11 +104,12 @@ getBudgetDetails <- function(i, param.token, param.budgetid) {
   
   mybudgetid <- param.budgetid
   myurl <- paste0(basepoint, "/budgets/", mybudgetid, "/", i)
-  mytoken <- param.token
+  mytoken.code <- param.token.code
+  mytoken.env <- param.token.env
   
   print(myurl)
   
-  df <- getYNAB(param.url = myurl, param.token = mytoken) %>% removeColumnprefix()
+  df <- getYNAB(param.url = myurl, param.token.code = mytoken.code, param.token.env = mytoken.env) %>% removeColumnprefix()
   
   if (i == "categories") {
     df <- rename(.data = df, subcategories = .data$categories)
@@ -124,7 +127,7 @@ getBudgetDetails <- function(i, param.token, param.budgetid) {
         category_name = trimws(gsub("[^[:alnum:][:space:][:punct:]]", "", x = .$category_name))
       )
     
-    df <- getUnsplit(d= df, param.token = mytoken, param.budgetid = mybudgetid)
+    df <- getUnsplit(d= df, param.token.code = mytoken.code, param.token.env = mytoken.env, param.budgetid = mybudgetid)
     
   }
   

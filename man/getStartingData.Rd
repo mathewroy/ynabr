@@ -4,7 +4,7 @@
 \alias{getStartingData}
 \title{Retrieves user or budget names}
 \usage{
-getStartingData(i, param.token)
+getStartingData(i, param.token.code, param.token.env)
 }
 \arguments{
 \item{i}{name of endpoint}

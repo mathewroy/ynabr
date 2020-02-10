@@ -6,7 +6,7 @@
 #' 
 #' @name refreshTransactions
 #' @keywords refreshTransactions
-#' @param param.token Your YNAB API personal access token
+#' @param param.token.code Your YNAB API personal access token
 #' @param param.budgetid The ID associated with the selected budget
 #' @param param.dfname (optional) Name of data frame which contains existing transactions
 #' @export
@@ -75,11 +75,14 @@ if(getRversion() >= "2.15.1")  utils::globalVariables(c(".","df_transactions"))
 #   }
 # }
 
+# Version: 0.1.1.0000
+# Added new parameter for token environment, rename param.token to param.token.code and mytoken to mytoken.code
 # Version: 0.1.0.0000
 # Added parameters for token, budget, exisiting transaction data frame name
-refreshTransactions <- function(param.token, param.budgetid, param.dfname) {
+refreshTransactions <- function(param.token.code, param.token.env, param.budgetid, param.dfname) {
   
-  mytoken <- param.token
+  mytoken.code <- param.token.code
+  mytoken.env <- param.token.env
   basepoint <- c("https://api.youneedabudget.com/v1")
   mybudgetid <- param.budgetid
   trans_url <- paste0(basepoint, "/budgets/", mybudgetid, "/transactions")
@@ -95,7 +98,7 @@ refreshTransactions <- function(param.token, param.budgetid, param.dfname) {
     
     df_transactions_updated <-
       tryCatch({
-        df_transactions_delta <- getYNAB(param.url = new_trans_url, param.token = mytoken) %>% 
+        df_transactions_delta <- getYNAB(param.url = new_trans_url, param.token.code = mytoken.code, param.token.env = mytoken.env) %>% 
           removeColumnprefix() %>% 
           mutate(.data = .,
                  date = as.Date(.data$date, "%Y-%m-%d"),
@@ -120,6 +123,6 @@ refreshTransactions <- function(param.token, param.budgetid, param.dfname) {
       })
   } else {
     print("df_transactions does not exist. Getting it now..")
-    getBudgetDetails(i = "transactions", param.token = mytoken, param.budgetid = mybudgetid)
+    getBudgetDetails(i = "transactions", param.token.code = mytoken.code, param.token.env = mytoken.env, param.budgetid = mybudgetid)
   }
 }

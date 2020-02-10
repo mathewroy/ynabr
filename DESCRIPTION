@@ -1,6 +1,6 @@
 Package: ynabr
 Title: ynabr - R for YNAB
-Version: 1.0.0000
+Version: 1.1.0000
 Authors@R: person("Mathew", "Roy", email = "mathewroy@outlook.com", role = c("aut", "cre"))
 Description: The ynabr package and its associated functions allow you to import data from You Need A Budget (YNAB). The scripts rely on connecting to YNAB's Application Program Interface (API), and extracting the available data related to accounts, users, monthly budgets, payees, transactions etc... After the appropriate data is extracted, users can analyze and visualize the data. This project is for any YNAB user interested in learning about their own budget behaviour. The goal of this project is to enable YNAB users to get a prespective on their own budgets and spending activities. A YNAB account is required.
 Depends: R (>= 3.5)

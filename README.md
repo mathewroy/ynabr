@@ -54,8 +54,13 @@ df_transactions <- refreshTransactions(param.token = mytoken, param.budgetid = m
 
 ```
 
-### Monthly spending tracker (Shiny App, run locally)
-Tracks the month-to-date spending by budget category.
+### Monthly spending tracker (Shiny App)
+Tracks the month-to-date spending by budget category. 
+
+#### Run on the web: [Monthly Spending Tracker](https://flash.shinyapps.io/spendingtracker/ "Monthly Spending Tracker") 
+
+#### Run Local:
+
 ```r
 # Load packages
 library(ynabr)
