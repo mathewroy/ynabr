@@ -2,7 +2,7 @@
 
 * **What is ynabr?** 
 
-  ynabr is an R package and a set of scripts that demonstrates how data from the popular budgeting software, You Need A Budget (YNAB), can be imported, analyzed, and visualized.
+  ynabr is a R package and a set of scripts that demonstrates how data from the popular budgeting software, You Need A Budget (YNAB), can be imported, analyzed, and visualized.
 
 * **How does it work?**
 
