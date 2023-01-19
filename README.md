@@ -2,7 +2,7 @@
 
 * **Update: 2023-01-19**
 
-  Some functions may no longer function as expected as I haven't had the time to maintain this package.
+  Some functions may no longer function as expected as I haven't had the time to maintain this package since 2020.
 
 * **What is ynabr?** 
 
